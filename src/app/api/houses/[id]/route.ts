@@ -7,11 +7,12 @@ const prisma = new PrismaClient()
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const id = context.params.id
   const house = await prisma.house.findUnique({
     where: {
-      id: params.id,
+      id: id,
     },
   })
 
@@ -24,21 +25,20 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const id = context.params.id
   const session = await getServerSession(authOptions)
 
   if (!session || !session.user) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
-  const house = await prisma.house.findUnique({
-    where: {
-      id: params.id,
-    },
+  const houseToUpdate = await prisma.house.findUnique({
+    where: { id: id },
   })
 
-  if (!house || house.ownerId !== session.user.id) {
+  if (!houseToUpdate || houseToUpdate.ownerId !== session.user.id) {
     return new NextResponse("Forbidden", { status: 403 })
   }
 
@@ -47,7 +47,7 @@ export async function PUT(
 
   const updatedHouse = await prisma.house.update({
     where: {
-      id: params.id,
+      id: id,
     },
     data: {
       title,
@@ -63,27 +63,26 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const id = context.params.id
   const session = await getServerSession(authOptions)
 
   if (!session || !session.user) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
-  const house = await prisma.house.findUnique({
-    where: {
-      id: params.id,
-    },
+  const houseToDelete = await prisma.house.findUnique({
+    where: { id: id },
   })
 
-  if (!house || house.ownerId !== session.user.id) {
+  if (!houseToDelete || houseToDelete.ownerId !== session.user.id) {
     return new NextResponse("Forbidden", { status: 403 })
   }
 
   await prisma.house.delete({
     where: {
-      id: params.id,
+      id: id,
     },
   })
 

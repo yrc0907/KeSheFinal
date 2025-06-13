@@ -49,7 +49,7 @@ export default function HousesPage() {
     fetchHouses()
   }, [searchParams])
 
-  return (
+    return (
     <div className="container mx-auto py-10">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
         <aside className="md:col-span-1 sticky top-20">
@@ -92,6 +92,6 @@ export default function HousesPage() {
           )}
         </main>
       </div>
-    </div>
-  )
+      </div>
+    )
 }
