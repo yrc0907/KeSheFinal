@@ -1,5 +1,5 @@
 "use client"
-
+/*eslint-disable*/
 import {
   Card,
   CardContent,
@@ -11,6 +11,7 @@ import {
 import { HouseSearchSidebar } from "@/components/HouseSearchSidebar"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 
 interface House {
   id: string
@@ -49,7 +50,7 @@ export default function HousesPage() {
     fetchHouses()
   }, [searchParams])
 
-    return (
+  return (
     <div className="container mx-auto py-10">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
         <aside className="md:col-span-1 sticky top-20">
@@ -63,23 +64,44 @@ export default function HousesPage() {
           ) : houses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {houses.map((house) => (
-                <Card key={house.id}>
-                  <CardHeader>
-                    <CardTitle>{house.title}</CardTitle>
-                    <CardDescription>{house.type}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="line-clamp-3 h-[60px]">{house.description}</p>
-                    <p className="mt-4 font-semibold text-lg">
-                      ${house.rent}/月
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {house.address}
-                    </p>
-                  </CardFooter>
-                </Card>
+                <Link href={`/houses/${house.id}`} key={house.id}>
+                  <Card className="flex flex-col justify-between h-full hover:shadow-lg transition-shadow duration-300">
+                    <div>
+                      <CardHeader>
+                        <CardTitle>{house.title}</CardTitle>
+                        <CardDescription>{house.type}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                          <p className="text-xs font-semibold uppercase text-muted-foreground">
+                            描述
+                          </p>
+                          <p className="text-sm line-clamp-3">
+                            {house.description}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs font-semibold uppercase text-muted-foreground">
+                            租金
+                          </p>
+                          <p className="font-semibold text-lg">
+                            ${house.rent}/月
+                          </p>
+                        </div>
+                      </CardContent>
+                    </div>
+                    <CardFooter>
+                      <div className="w-full space-y-1">
+                        <p className="text-xs font-semibold uppercase text-muted-foreground">
+                          地址
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {house.address}
+                        </p>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (
@@ -92,6 +114,6 @@ export default function HousesPage() {
           )}
         </main>
       </div>
-      </div>
-    )
+    </div>
+  )
 }

@@ -14,6 +14,14 @@ export async function GET(
     where: {
       id: id,
     },
+    include: {
+      owner: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
   })
 
   if (!house) {
