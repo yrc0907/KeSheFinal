@@ -74,7 +74,7 @@ export default function Navbar() {
                   <DropdownMenuItem onClick={() => router.push('/my-houses')}>
                     我的房源
                   </DropdownMenuItem>
-                  <DropdownMenuItem disabled>
+                  <DropdownMenuItem onClick={() => router.push('/settings')}>
                     设置
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
