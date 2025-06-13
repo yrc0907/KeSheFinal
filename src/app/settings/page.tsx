@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useRef } from "react"
 import {
@@ -63,9 +63,10 @@ export default function SettingsPage() {
       body: JSON.stringify({ currentPassword, newPassword }),
     })
     if (response.ok) {
-      toast.success("密码修改成功！")
+      toast.success("密码修改成功！请重新登录。")
       setCurrentPassword("")
       setNewPassword("")
+      await signOut({ callbackUrl: "/login" })
     } else {
       const data = await response.json()
       toast.error(data.error || "密码修改失败。")
