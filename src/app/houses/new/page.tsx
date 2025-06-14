@@ -24,9 +24,38 @@ export default function NewHousePage() {
   const [address, setAddress] = useState("")
   const [rent, setRent] = useState("")
   const [type, setType] = useState("")
+  const [images, setImages] = useState<File[]>([])
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImages(Array.from(e.target.files))
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    let imageUrls: string[] = []
+    if (images.length > 0) {
+      const formData = new FormData()
+      images.forEach((image) => {
+        formData.append("files", image)
+      })
+
+      const uploadResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json()
+        imageUrls = uploadResult.filenames
+      } else {
+        console.error("Failed to upload images")
+        // Optionally, show an error to the user
+        return
+      }
+    }
 
     const response = await fetch("/api/houses", {
       method: "POST",
@@ -37,6 +66,7 @@ export default function NewHousePage() {
         address,
         rent: parseFloat(rent),
         type,
+        images: imageUrls,
       }),
     })
 
@@ -90,6 +120,15 @@ export default function NewHousePage() {
                 value={rent}
                 onChange={(e) => setRent(e.target.value)}
                 required
+              />
+            </div>
+            <div>
+              <Label htmlFor="images">Images</Label>
+              <Input
+                id="images"
+                type="file"
+                multiple
+                onChange={handleImageChange}
               />
             </div>
             <div>

@@ -13,6 +13,12 @@ import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
+
+interface HouseImage {
+  id: string
+  url: string
+}
 
 interface House {
   id: string
@@ -20,6 +26,7 @@ interface House {
   address: string
   rent: number
   type: string
+  images: HouseImage[]
 }
 
 export default function MyHousesPage() {
@@ -64,6 +71,7 @@ export default function MyHousesPage() {
         <TableCaption>A list of your published houses.</TableCaption>
         <TableHeader>
           <TableRow>
+            <TableHead>Image</TableHead>
             <TableHead>Title</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Address</TableHead>
@@ -74,6 +82,21 @@ export default function MyHousesPage() {
         <TableBody>
           {houses.map((house) => (
             <TableRow key={house.id}>
+              <TableCell>
+                {house.images && house.images.length > 0 ? (
+                  <Image
+                    src={house.images[0].url}
+                    alt={house.title}
+                    width={100}
+                    height={100}
+                    className="object-cover rounded-md"
+                  />
+                ) : (
+                  <div className="w-[100px] h-[100px] bg-gray-200 rounded-md flex items-center justify-center">
+                    <span className="text-xs text-gray-500">No Image</span>
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="font-medium">{house.title}</TableCell>
               <TableCell>{house.type}</TableCell>
               <TableCell>{house.address}</TableCell>

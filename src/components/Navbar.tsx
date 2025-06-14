@@ -1,5 +1,5 @@
 "use client"
-
+/*eslint-disable*/
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import {
@@ -71,11 +71,20 @@ export default function Navbar() {
                   <DropdownMenuItem onClick={() => router.push('/dashboard')}>
                     仪表盘
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/my-houses')}>
-                    我的房源
+                  <DropdownMenuItem>
+                    <Link href="/my-houses" className="w-full">
+                      我的房源
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem disabled>
-                    设置
+                  <DropdownMenuItem>
+                    <Link href="/my-posts" className="w-full">
+                      我的帖子
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/settings" className="w-full">
+                      设置
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>

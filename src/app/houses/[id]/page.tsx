@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Mail, MapPin, Building, DollarSign, Info } from "lucide-react"
+import Image from "next/image"
+import { CommentSection } from "./CommentSection"
 
 interface HouseDetail {
   id: string
@@ -26,6 +28,10 @@ interface HouseDetail {
     name: string | null
     email: string | null
   }
+  images: {
+    id: string
+    url: string
+  }[]
 }
 
 export default function HouseDetailPage() {
@@ -132,6 +138,28 @@ export default function HouseDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {house.images && house.images.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-2xl font-bold mb-4">房屋图片</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {house.images.map((image) => (
+              <div key={image.id} className="relative aspect-video">
+                <Image
+                  src={image.url}
+                  alt={house.title}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-8">
+        <CommentSection houseId={house.id} />
+      </div>
     </div>
   )
 } 

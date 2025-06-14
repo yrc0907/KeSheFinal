@@ -24,8 +24,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -47,27 +46,92 @@ model VerificationToken {
 }
 
 model House {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   title       String
   description String
   address     String
   rent        Float
   type        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  owner       User     @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  owner       User       @relation("UserHouses", fields: [ownerId], references: [id])
   ownerId     String
+  images      HouseImage[]
+  comments    Comment[]
+}
+
+model HouseImage {
+  id      String @id @default(cuid())
+  url     String
+  house   House  @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  houseId String
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  images    PostImage[]
+  likes     Like[]
+  comments  Comment[]
+}
+
+model PostImage {
+  id     String @id @default(cuid())
+  url    String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+}
+
+model Like {
+  id     String @id @default(cuid())
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  image     String? // Optional image for the comment
+  createdAt DateTime @default(now())
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String?
+  house     House?   @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  houseId   String?
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+
+  // Self-relation for replies
+  parentId String?
+  parent   Comment?  @relation("Replies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies  Comment[] @relation("Replies")
+
+  // For grouping replies under a root comment
+  rootId  String?
+  root    Comment?  @relation("Threads", fields: [rootId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  thread  Comment[] @relation("Threads")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  createdAt     DateTime  @default(now())
-  accounts      Account[]
-  sessions      Session[]
-  houses        House[]
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  createdAt      DateTime  @default(now())
+  accounts       Account[]
+  sessions       Session[]
+  houses         House[]   @relation("UserHouses")
+  posts          Post[]
+  likes          Like[]
+  comments       Comment[]
 }
