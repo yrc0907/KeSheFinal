@@ -22,6 +22,7 @@ export async function GET(
           email: true,
         },
       },
+      images: true,
     },
   })
 
@@ -52,7 +53,22 @@ export async function PUT(
   }
 
   const body = await request.json()
-  const { title, description, address, rent, type } = body
+  const { title, description, address, rent, type, images, imagesToDelete } = body
+
+  if (imagesToDelete && imagesToDelete.length > 0) {
+    await prisma.houseImage.deleteMany({
+      where: {
+        id: {
+          in: imagesToDelete,
+        },
+        // Make sure user can only delete images from their own house
+        house: {
+          id: id,
+          ownerId: session.user.id,
+        },
+      },
+    })
+  }
 
   const updatedHouse = await prisma.house.update({
     where: {
@@ -64,6 +80,14 @@ export async function PUT(
       address,
       rent,
       type,
+      ...(images && images.length > 0 && {
+        images: {
+          create: images.map((url: string) => ({ url })),
+        },
+      }),
+    },
+    include: {
+      images: true,
     },
   })
 

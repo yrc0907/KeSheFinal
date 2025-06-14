@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json()
-  const { title, description, address, rent, type } = body
+  const { title, description, address, rent, type, images } = body
 
   if (!title || !description || !address || !rent || !type) {
     return new NextResponse("Missing required fields", { status: 400 })
@@ -29,6 +29,14 @@ export async function POST(request: Request) {
         rent,
         type,
         ownerId: session.user.id,
+        ...(images && images.length > 0 && {
+          images: {
+            create: images.map((url: string) => ({ url })),
+          },
+        }),
+      },
+      include: {
+        images: true,
       },
     })
 

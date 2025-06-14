@@ -17,6 +17,9 @@ export async function GET(request: Request) {
     where: {
       ownerId: session.user.id,
     },
+    include: {
+      images: true,
+    },
     orderBy: {
       createdAt: "desc",
     },

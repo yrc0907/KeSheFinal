@@ -22,6 +22,7 @@ export default function NewPostPage() {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files) {
+
       const newFiles = Array.from(files)
       setSelectedFiles(prevFiles => [...prevFiles, ...newFiles])
     }

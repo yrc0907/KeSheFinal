@@ -17,6 +17,11 @@ import { deletePost } from "./actions"
 import { Separator } from "@/components/ui/separator"
 import { CommentSection } from "./CommentSection"
 import { LikeButton } from "./LikeButton"
+import Lightbox from "yet-another-react-lightbox"
+import "yet-another-react-lightbox/styles.css"
+import "yet-another-react-lightbox/plugins/thumbnails.css"
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails"
+import { useState } from "react"
 
 export const dynamic = 'force-dynamic'
 
@@ -28,6 +33,7 @@ interface PostPageProps {
 
 export default async function PostPage({ params }: PostPageProps) {
   const session = await getServerSession(authOptions)
+
   const post = await prisma.post.findUnique({
     where: {
       id: params.id,
@@ -35,26 +41,24 @@ export default async function PostPage({ params }: PostPageProps) {
     include: {
       author: true,
       images: true,
-      comments: {
-        include: {
-          author: true,
-        },
-        orderBy: {
-          createdAt: 'asc',
-        },
-      },
-      likes: {
-        where: {
-          userId: session?.user?.id || "",
-        },
-      },
-      _count: {
-        select: {
-          likes: true,
-          comments: true,
-        },
-      }
+      likes: true,
     },
+  })
+
+  const initialComments = await prisma.comment.findMany({
+    where: { postId: params.id, parentId: null },
+    take: 10,
+    orderBy: { createdAt: "asc" },
+    include: {
+      author: true,
+      _count: {
+        select: { replies: true },
+      },
+    },
+  })
+
+  const totalComments = await prisma.comment.count({
+    where: { postId: params.id, parentId: null },
   })
 
   if (!post) {
@@ -107,17 +111,37 @@ export default async function PostPage({ params }: PostPageProps) {
           <p className="text-lg whitespace-pre-wrap">{post.content}</p>
         </CardContent>
         <CardFooter>
-          <LikeButton
-            postId={post.id}
-            initialLikes={post._count.likes}
-            isInitiallyLiked={post.likes.length > 0}
-          />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <LikeButton
+                postId={post.id}
+                initialLikes={post.likes.length}
+                isInitiallyLiked={post.likes.some(like => like.userId === session?.user?.id)}
+              />
+            </div>
+            {session?.user?.id === post.authorId && (
+              <div className="flex gap-2">
+                <Link href={`/forum/edit/${post.id}`}>
+                  <Button variant="outline">修改</Button>
+                </Link>
+                <form action={deletePost.bind(null, post.id)}>
+                  <Button type="submit" variant="destructive">
+                    删除
+                  </Button>
+                </form>
+              </div>
+            )}
+          </div>
         </CardFooter>
       </Card>
 
       <Separator />
 
-      <CommentSection postId={post.id} initialComments={post.comments} />
+      <CommentSection
+        postId={post.id}
+        initialComments={initialComments}
+        totalComments={totalComments}
+      />
     </div>
   )
 } 
