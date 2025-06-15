@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI 课设生成项目 README
 
-## Getting Started
+## 项目背景与初衷
 
-First, run the development server:
+💡 **为什么开发这个项目？**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+计算机专业课设常面临三大痛点：
+
+1. **模板同质化**：图书管理系统、学生成绩管理等课设千篇一律，重复劳动浪费时间；
+2. **技术门槛高**：非技术方向学生难以独立完成，外包费用高（500-2000 元），AI 自建耗时耗力；
+## 适用人群
+- 老师不考虑框架，仅仅要求功能完成。
+-  对于计算机不感兴趣的学生，选这个专业纯属无奈。
+  
+本项目专为计算机学生打造**一键生成课设解决方案**，支持按技术栈定制管理系统，让课设从 "耗时麻烦" 变为 "装逼神器"！
+
+## 核心功能与特色
+
+### 📚 基础管理系统功能
+
+* **全场景模板**：覆盖图书管理、学生信息、报修系统等 10 + 经典课设场景；
+* **CRUD 功能**：自动生成增删改查（Create/Read/Update/Delete）基础接口与页面；
+* **权限管理**：内置管理员 / 普通用户角色，支持权限控制（如教师批改作业、学生查看成绩）。
+
+### 🌟 高级拓展功能
+
+| 功能模块 | 核心优势 |
+| :--- | :--- |
+| 大文件上传 | 支持 100MB + 文件分片上传，适配课程资源管理等场景，含进度条与断点续传。 |
+| 楼中楼评论 | 多级评论系统，适用于项目讨论区、作业互评等功能，提升交互体验。 |
+| 多主题切换 | 内置「简约白」「科技蓝」「暗黑模式」等主题，后续将增加「学院风」「扁平风」等个性化皮肤。 |
+| 代码即文档 | 使用 Prisma ORM，数据库模型直接在代码中定义，无需额外学习 SQL 语句。 |
+
+## 技术栈匹配方案
+
+### 🔧 按技术方向定制
+
+* **技术栈**：Next.js 15 + React 19 + Shadcn/ui + Prisma + PostgreSQL
+* **特色**：全前端可视化页面，支持 Server Components 优化性能，适配移动端与 PC 端。TypeScript 全类型安全，一键生成前后端联调代码，数据库操作零门槛。
+
+## 零门槛使用流程， 快速部署运行
+运行命令即可，你甚至不需要懂数据库。
+bash
+# 前端（Next.js示例）
+pnpm install
+pnpm run dev
+npx prisma db push
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 1\. 选择课设类型与技术栈
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* 输入关键词（如 "图书管理系统"），选择语言（Java/Go/ 前端）；
+* 勾选功能模块（基础 CRUD、评论系统、文件上传等）。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2\. 生成个性化项目
 
-## Learn More
+* 选择主题风格（如 "科技蓝"），自定义项目名称（如 "SmartLibrary\_2024"）；
+* 一键生成代码，自动配置 Prisma 数据库模型与接口。
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4\. 差异化加分技巧
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* 利用多主题功能切换界面风格，避免与同学撞车；
+* 在 README 中添加自定义功能说明（如 "新增图书推荐算法"），提升项目独特性。
 
-## Deploy on Vercel
+## 技术亮点与优势
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 🚀 对新手友好的设计
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Prisma 可视化建模**：通过代码直接定义数据库表结构，无需手动创建 SQL 文件：
+
+prisma
+
+```
+model Book {
+  id        String   @id @default(uuid())
+  title     String
+  author    String
+  category  String
+  createdAt DateTime @default(now())
+  comments  Comment[]
+}
+```
+* **一键初始化数据库**：仅需一条命令自动创建表结构：
+
+bash
+
+```
+npx prisma db push
+```
+
+### 🌈 可拓展性设计
+
+* **模块化架构**：按功能拆分文件夹（如`/modules/book`），方便后续添加新功能；
+* **组件化 UI**：使用 Shadcn/ui 生成可复用组件，修改样式不影响逻辑代码。
+## 项目路线图
+
+* 集成 AI 代码优化建议，自动生成课设答辩 PPT；
+* 支持按课程大纲生成定制化项目（如《数据库原理》课设专属模板）。
+
+---
+
+**告别千篇一律的课设，用 AI 快速搞定作业，把时间留给真正想学的技术！**
+任何反馈，欢迎提交邮箱到rongcaiyu134@gamil.com，也欢迎各位提交pr实现拓展
