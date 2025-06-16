@@ -14,10 +14,47 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./ThemeToggle"
 import { useRouter } from "next/navigation"
+import { useSystem } from "@/context/SystemContext"
 
 export default function Navbar() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { system, systemName } = useSystem()
+  
+  // System-specific navigation items
+  const navItems = {
+    rental: [
+      { name: "房源", href: "/houses" },
+      { name: "论坛", href: "/forum" },
+    ],
+    book: [
+      { name: "图书", href: "/houses" }, // Reusing houses route for books
+      { name: "读者论坛", href: "/forum" },
+    ],
+    teacher: [
+      { name: "教师", href: "/houses" }, // Reusing houses route for teachers
+      { name: "教师论坛", href: "/forum" },
+    ],
+  }[system]
+  
+  // System-specific dropdown items
+  const dropdownItems = {
+    rental: [
+      { name: "仪表盘", href: "/dashboard" },
+      { name: "我的房源", href: "/my-houses" },
+      { name: "我的帖子", href: "/my-posts" },
+    ],
+    book: [
+      { name: "仪表盘", href: "/dashboard" },
+      { name: "我的图书", href: "/my-houses" }, // Reusing my-houses route
+      { name: "我的评论", href: "/my-posts" }, // Reusing my-posts route
+    ],
+    teacher: [
+      { name: "仪表盘", href: "/dashboard" },
+      { name: "我的课程", href: "/my-houses" }, // Reusing my-houses route
+      { name: "我的评价", href: "/my-posts" }, // Reusing my-posts route
+    ],
+  }[system]
 
   return (
     <nav className="bg-background shadow-sm">
@@ -25,21 +62,18 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <Link href="/" className="font-bold text-lg">
-              HouseRental
+              {systemName || "管理系统"}
             </Link>
             <div className="hidden md:flex items-baseline space-x-4">
-              <Link
-                href="/houses"
-                className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
-              >
-                房源
-              </Link>
-              <Link
-                href="/forum"
-                className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
-              >
-                论坛
-              </Link>
+              {navItems.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
+                >
+                  {item.name}
+                </Link>
+              ))}
             </div>
           </div>
           <div className="flex items-center space-x-4">
@@ -68,19 +102,11 @@ export default function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-                    仪表盘
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/my-houses" className="w-full">
-                      我的房源
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/my-posts" className="w-full">
-                      我的帖子
-                    </Link>
-                  </DropdownMenuItem>
+                  {dropdownItems.map((item, index) => (
+                    <DropdownMenuItem key={index} onClick={() => router.push(item.href)}>
+                      {item.name}
+                    </DropdownMenuItem>
+                  ))}
                   <DropdownMenuItem>
                     <Link href="/settings" className="w-full">
                       设置

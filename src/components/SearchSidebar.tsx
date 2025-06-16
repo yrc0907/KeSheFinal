@@ -18,80 +18,22 @@ import { useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 import { useSystem } from "@/context/SystemContext"
 
-export function HouseSearchSidebar() {
+export function SearchSidebar() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { replace } = useRouter()
-  const { system } = useSystem()
+  const { config, system } = useSystem()
 
   const [rentRange, setRentRange] = useState<[number]>([5000])
 
-  // System-specific UI labels
-  const uiLabels = {
-    rental: {
-      title: "发布与查询",
-      publishBtn: "发布新房源",
-      loginNotice: "发布房源请先登录",
-      searchTitle: "查询房源",
-      addressLabel: "街道地址",
-      addressPlaceholder: "搜索街道...",
-      typeLabel: "房屋类型",
-      typePlaceholder: "筛选类型",
-      allTypesLabel: "所有类型",
-      types: [
-        { value: "Apartment", label: "公寓" },
-        { value: "House", label: "独栋" },
-        { value: "Room", label: "单间" }
-      ],
-      rentLabel: "最高租金",
-      rentSymbol: "$"
-    },
-    book: {
-      title: "添加与查询",
-      publishBtn: "添加新图书",
-      loginNotice: "添加图书请先登录",
-      searchTitle: "查询图书",
-      addressLabel: "馆藏位置",
-      addressPlaceholder: "搜索位置...",
-      typeLabel: "图书类型",
-      typePlaceholder: "筛选类型",
-      allTypesLabel: "所有类型",
-      types: [
-        { value: "Fiction", label: "小说" },
-        { value: "NonFiction", label: "非小说" },
-        { value: "Reference", label: "参考资料" }
-      ],
-      rentLabel: "最高借阅费",
-      rentSymbol: "¥"
-    },
-    teacher: {
-      title: "登记与查询",
-      publishBtn: "登记新教师",
-      loginNotice: "登记教师请先登录",
-      searchTitle: "查询教师",
-      addressLabel: "办公地点",
-      addressPlaceholder: "搜索办公室...",
-      typeLabel: "教师类型",
-      typePlaceholder: "筛选类型",
-      allTypesLabel: "所有类型",
-      types: [
-        { value: "Professor", label: "教授" },
-        { value: "AssociateProfessor", label: "副教授" },
-        { value: "Lecturer", label: "讲师" }
-      ],
-      rentLabel: "最高课时费",
-      rentSymbol: "¥"
-    }
-  }[system || "rental"]
-
-  const handleSearch = useDebouncedCallback((term: string) => {
+  const handleSearch = useDebouncedCallback((term: string, field: string) => {
     const params = new URLSearchParams(searchParams)
     if (term) {
-      params.set("query", term)
+      params.set(field, term)
     } else {
-      params.delete("query")
+      params.delete(field)
     }
     replace(`${pathname}?${params.toString()}`)
   }, 300)
@@ -123,7 +65,7 @@ export function HouseSearchSidebar() {
 
   const handlePublishClick = () => {
     if (status === "authenticated") {
-      router.push("/houses/new")
+      router.push(`/${system}/new`)
     } else {
       router.push("/login")
     }
@@ -135,52 +77,52 @@ export function HouseSearchSidebar() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{uiLabels.title}</CardTitle>
+        <CardTitle>发布与查询</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
           <Button onClick={handlePublishClick} className="w-full">
-            {uiLabels.publishBtn}
+            发布新{config.entity}
           </Button>
           {status !== "authenticated" && (
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              {uiLabels.loginNotice}
+              发布{config.entity}请先登录
             </p>
           )}
         </div>
 
         <div className="space-y-4 pt-6 border-t">
-          <h3 className="text-lg font-semibold">{uiLabels.searchTitle}</h3>
+          <h3 className="text-lg font-semibold">查询{config.entities}</h3>
+          {Object.entries(config.fields).map(([key, label]) => (
+            <div className="space-y-2" key={key}>
+              <Label htmlFor={`search-${key}`}>{label}</Label>
+              <Input
+                id={`search-${key}`}
+                placeholder={`搜索${label}...`}
+                onChange={(e) => handleSearch(e.target.value, key)}
+                defaultValue={getSearchParam(key)}
+              />
+            </div>
+          ))}
           <div className="space-y-2">
-            <Label htmlFor="search-street">{uiLabels.addressLabel}</Label>
-            <Input
-              id="search-street"
-              placeholder={uiLabels.addressPlaceholder}
-              onChange={(e) => handleSearch(e.target.value)}
-              defaultValue={getSearchParam("query")}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="search-type">{uiLabels.typeLabel}</Label>
+            <Label htmlFor="search-type">房屋类型</Label>
             <Select
               onValueChange={handleTypeFilter}
               defaultValue={getSearchParam("type", "all")}
             >
               <SelectTrigger id="search-type">
-                <SelectValue placeholder={uiLabels.typePlaceholder} />
+                <SelectValue placeholder="筛选类型" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{uiLabels.allTypesLabel}</SelectItem>
-                {uiLabels.types.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">所有类型</SelectItem>
+                <SelectItem value="Apartment">公寓</SelectItem>
+                <SelectItem value="House">独栋</SelectItem>
+                <SelectItem value="Room">单间</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="rent-slider">{uiLabels.rentLabel}: {uiLabels.rentSymbol}{rentRange[0]}</Label>
+            <Label htmlFor="rent-slider">最高租金: ${rentRange[0]}</Label>
             <Slider
               id="rent-slider"
               max={5000}

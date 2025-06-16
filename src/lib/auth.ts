@@ -12,6 +12,7 @@ export const authOptions: AuthOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
+        systemType: { label: "System Type", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -35,6 +36,14 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid credentials")
         }
 
+        // If login with a system type, update user's system type
+        if (credentials.systemType && user.systemType !== credentials.systemType) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { systemType: credentials.systemType },
+          })
+        }
+
         return user
       },
     }),
@@ -55,11 +64,15 @@ export const authOptions: AuthOptions = {
         if (session.image) {
           token.picture = session.image
         }
+        if (session.systemType) {
+          token.systemType = session.systemType
+        }
       }
       if (user) {
         token.id = user.id
         token.name = user.name
         token.picture = user.image
+        token.systemType = (user as any).systemType || "rental"
       }
       return token
     },
@@ -68,6 +81,7 @@ export const authOptions: AuthOptions = {
         session.user.id = token.id as string
         session.user.name = token.name as string | null
         session.user.image = token.picture as string | null
+        session.user.systemType = token.systemType as string
       }
       return session
     },

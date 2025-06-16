@@ -127,6 +127,8 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
+  systemType     String?   @default("rental") // The system type (rental, book, teacher)
+  metadata       String?   // JSON string to store additional fields based on system type
   createdAt      DateTime  @default(now())
   accounts       Account[]
   sessions       Session[]
