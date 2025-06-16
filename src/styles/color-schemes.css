@@ -1,0 +1,103 @@
+/* 颜色主题定义 */
+
+/* 默认主题 - 保持当前样式 */
+:root[data-color-scheme="default"] {
+  /* 默认主题使用 globals.css 中定义的颜色 */
+}
+
+/* 蓝色主题 */
+:root[data-color-scheme="blue"] {
+  --primary: oklch(0.49 0.27 260);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.85 0.07 260);
+  --secondary-foreground: oklch(0.25 0.03 260);
+  --accent: oklch(0.87 0.03 260);
+  --accent-foreground: oklch(0.27 0.05 260);
+  --muted: oklch(0.97 0.01 260);
+  --muted-foreground: oklch(0.55 0.01 260);
+  --destructive: oklch(0.6 0.25 25);
+  
+  --sidebar-primary: oklch(0.49 0.27 260);
+  --chart-1: oklch(0.57 0.24 264);
+  --chart-2: oklch(0.7 0.17 240);
+  --chart-3: oklch(0.42 0.17 250);
+}
+
+/* 绿色主题 */
+:root[data-color-scheme="green"] {
+  --primary: oklch(0.45 0.23 150);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.83 0.07 150);
+  --secondary-foreground: oklch(0.23 0.05 150);
+  --accent: oklch(0.85 0.03 150);
+  --accent-foreground: oklch(0.25 0.05 150);
+  --muted: oklch(0.97 0.01 150);
+  --muted-foreground: oklch(0.55 0.01 150);
+  --destructive: oklch(0.6 0.25 25);
+  
+  --sidebar-primary: oklch(0.45 0.23 150);
+  --chart-1: oklch(0.53 0.22 154);
+  --chart-2: oklch(0.65 0.17 145);
+  --chart-3: oklch(0.4 0.14 160);
+}
+
+/* 紫色主题 */
+:root[data-color-scheme="purple"] {
+  --primary: oklch(0.47 0.25 300);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.82 0.07 300);
+  --secondary-foreground: oklch(0.25 0.05 300);
+  --accent: oklch(0.85 0.03 300);
+  --accent-foreground: oklch(0.27 0.05 300);
+  --muted: oklch(0.97 0.01 300);
+  --muted-foreground: oklch(0.55 0.01 300);
+  --destructive: oklch(0.6 0.25 25);
+  
+  --sidebar-primary: oklch(0.47 0.25 300);
+  --chart-1: oklch(0.57 0.24 304);
+  --chart-2: oklch(0.68 0.18 290);
+  --chart-3: oklch(0.42 0.18 310);
+}
+
+/* 橙色主题 */
+:root[data-color-scheme="orange"] {
+  --primary: oklch(0.65 0.26 50);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.87 0.07 50);
+  --secondary-foreground: oklch(0.30 0.05 50);
+  --accent: oklch(0.9 0.03 50);
+  --accent-foreground: oklch(0.33 0.05 50);
+  --muted: oklch(0.97 0.01 50);
+  --muted-foreground: oklch(0.58 0.01 50);
+  --destructive: oklch(0.6 0.25 25);
+  
+  --sidebar-primary: oklch(0.65 0.26 50);
+  --chart-1: oklch(0.70 0.24 45);
+  --chart-2: oklch(0.75 0.17 55);
+  --chart-3: oklch(0.63 0.18 40);
+}
+
+/* 深色模式下的颜色方案调整 */
+.dark[data-color-scheme="blue"] {
+  --primary: oklch(0.65 0.22 250);
+  --primary-foreground: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.57 0.24 264);
+}
+
+.dark[data-color-scheme="green"] {
+  --primary: oklch(0.62 0.18 150);
+  --primary-foreground: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.53 0.22 154);
+}
+
+.dark[data-color-scheme="purple"] {
+  --primary: oklch(0.64 0.20 300);
+  --primary-foreground: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.57 0.24 304);
+}
+
+.dark[data-color-scheme="orange"] {
+  --primary: oklch(0.72 0.22 50);
+  --primary-foreground: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.68 0.22 45);
+} 

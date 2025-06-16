@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./ThemeToggle"
+import { ColorSchemeToggle } from "./ColorSchemeToggle"
 import { useRouter } from "next/navigation"
 import { useSystem } from "@/context/SystemContext"
 
@@ -20,7 +21,7 @@ export default function Navbar() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const { system, systemName } = useSystem()
-  
+
   // System-specific navigation items
   const navItems = {
     rental: [
@@ -36,7 +37,7 @@ export default function Navbar() {
       { name: "教师论坛", href: "/forum" },
     ],
   }[system]
-  
+
   // System-specific dropdown items
   const dropdownItems = {
     rental: [
@@ -77,6 +78,7 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            <ColorSchemeToggle />
             <ThemeToggle />
             {status === "loading" ? (
               <div className="h-8 w-20 bg-muted rounded-md animate-pulse"></div>
