@@ -11,14 +11,34 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSystem } from "@/context/SystemContext"
+import { systems } from "@/config/systems"
 
 export default function RegisterPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const router = useRouter()
+  const { system } = useSystem()
+  const [formData, setFormData] = useState<Record<string, string>>({})
+
+  // Redirect to system selection if no system is selected
+  useEffect(() => {
+    const savedSystem = localStorage.getItem("selectedSystem")
+    if (!savedSystem) {
+      router.push("/system-select")
+    } else {
+      // Initialize form data based on system fields
+      const initialData: Record<string, string> = {}
+      systems[system as keyof typeof systems].register.fields.forEach(field => {
+        initialData[field.id] = ""
+      })
+      setFormData(initialData)
+    }
+  }, [router, system])
+
+  const handleInputChange = (id: string, value: string) => {
+    setFormData(prev => ({ ...prev, [id]: value }))
+  }
 
   const handleRegister = async () => {
     const response = await fetch("/api/register", {
@@ -26,7 +46,7 @@ export default function RegisterPage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ ...formData, systemType: system }),
     })
 
     if (response.ok) {
@@ -37,52 +57,43 @@ export default function RegisterPage() {
     }
   }
 
+  // Get the configuration for the current system
+  const systemConfig = systems[system as keyof typeof systems]
+
+  if (!systemConfig) {
+    return null  // Or a loading state
+  }
+
   return (
     <div className="flex justify-center items-center h-screen">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Register</CardTitle>
+          <CardTitle>{systemConfig.register.title}</CardTitle>
           <CardDescription>
-            Create a new account.
+            {systemConfig.register.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+            {systemConfig.register.fields.map((field) => (
+              <div key={field.id} className="flex flex-col space-y-1.5">
+                <Label htmlFor={field.id}>{field.label}</Label>
+                <Input
+                  id={field.id}
+                  type={field.type || "text"}
+                  placeholder={field.placeholder}
+                  value={formData[field.id] || ""}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                />
+              </div>
+            ))}
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => router.push("/login")}>
-            Login
+            {systemConfig.register.backButton}
           </Button>
-          <Button onClick={handleRegister}>Register</Button>
+          <Button onClick={handleRegister}>{systemConfig.register.submitButton}</Button>
         </CardFooter>
       </Card>
     </div>

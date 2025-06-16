@@ -12,8 +12,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSystem } from "@/context/SystemContext"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -21,6 +22,39 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { system, systemName } = useSystem()
+
+  // Redirect to system selection if no system is selected
+  useEffect(() => {
+    const savedSystem = localStorage.getItem("selectedSystem")
+    if (!savedSystem) {
+      router.push("/system-select")
+    }
+  }, [router])
+
+  // System-specific content
+  const systemContent = {
+    rental: {
+      title: "登录",
+      description: "输入您的凭据以登录租房系统。",
+      registerButtonText: "注册",
+      loginButtonText: "登录",
+    },
+    book: {
+      title: "图书管理系统登录",
+      description: "输入您的凭据以登录图书管理系统。",
+      registerButtonText: "注册新账号",
+      loginButtonText: "登录系统",
+    },
+    teacher: {
+      title: "教师管理系统登录",
+      description: "输入您的凭据以登录教师管理系统。",
+      registerButtonText: "注册新账号",
+      loginButtonText: "登录系统",
+    },
+  }
+
+  const content = systemContent[system]
 
   const handleLogin = async () => {
     setIsLoading(true)
@@ -30,6 +64,7 @@ export default function LoginPage() {
         redirect: false,
         email,
         password,
+        systemType: system, // Pass the system type to the sign in function
       })
 
       if (result?.ok) {
@@ -51,29 +86,29 @@ export default function LoginPage() {
     <div className="flex justify-center items-center h-screen">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
+          <CardTitle>{content.title}</CardTitle>
           <CardDescription>
-            Enter your credentials to login.
+            {content.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">邮箱</Label>
               <Input
                 id="email"
-                placeholder="Enter your email"
+                placeholder="请输入邮箱"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
               />
             </div>
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">密码</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="请输入密码"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -84,10 +119,10 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => router.push("/register")} disabled={isLoading}>
-            Register
+            {content.registerButtonText}
           </Button>
           <Button onClick={handleLogin} disabled={isLoading}>
-            {isLoading ? "登录中..." : "Login"}
+            {isLoading ? "登录中..." : content.loginButtonText}
           </Button>
         </CardFooter>
       </Card>

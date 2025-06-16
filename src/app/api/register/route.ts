@@ -6,10 +6,10 @@ import { prisma } from "@/lib/prisma"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, email, password } = body
+    const { name, email, password, systemType, ...otherFields } = body
 
-    if (!name || !email || !password) {
-      return new NextResponse("Missing name, email, or password", { status: 400 })
+    if (!email || !password) {
+      return new NextResponse("Missing required fields", { status: 400 })
     }
 
     const exist = await prisma.user.findUnique({
@@ -26,9 +26,14 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.create({
       data: {
-        name,
+        name: name || email.split("@")[0], // Use part of email if name not provided
         email,
         hashedPassword: hashedPassword,
+        systemType: systemType || "rental", // Default to rental if not specified
+        metadata: {
+          // Store additional fields in metadata
+          ...otherFields
+        }
       },
     })
 
