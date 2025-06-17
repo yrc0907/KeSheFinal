@@ -1,4 +1,64 @@
-export const systems = {
+export const systemContent = {
+  rental: {
+    title: "欢迎来到房屋租赁平台",
+    description: "在这里找到您理想的家。我们提供最新、最全的房源信息，助您轻松开启新生活。",
+    primaryButton: {
+      text: "开始浏览房源",
+      link: "/houses"
+    },
+    secondaryButton: {
+      text: "进入社区论坛",
+      link: "/forum"
+    }
+  },
+  book: {
+    title: "欢迎来到图书管理系统",
+    description: "查找、借阅和管理图书馆的藏书。我们提供高效、便捷的图书管理服务。",
+    primaryButton: {
+      text: "浏览书目",
+      link: "/houses" // Reusing the houses route for books
+    },
+    secondaryButton: {
+      text: "读者论坛",
+      link: "/forum"
+    }
+  },
+  teacher: {
+    title: "欢迎来到教师管理系统",
+    description: "管理和查询教师信息、课程安排和教学评价。为学校提供全面的教师资源管理。",
+    primaryButton: {
+      text: "浏览教师",
+      link: "/houses" // Reusing the houses route for teachers
+    },
+    secondaryButton: {
+      text: "教师论坛",
+      link: "/forum"
+    }
+  }
+}
+
+export interface RegisterField {
+  id: string;
+  label: string;
+  placeholder: string;
+  type: "text" | "email" | "password" | "number";
+}
+
+export interface RegisterConfig {
+  title: string;
+  description: string;
+  fields: RegisterField[];
+  submitButton: string;
+  backButton: string;
+}
+
+export interface SystemDetails {
+  label: string;
+  entity: string;
+  register: RegisterConfig;
+}
+
+export const systemConfig: Record<string, SystemDetails> = {
   book: {
     label: "图书管理系统",
     entity: "book",
@@ -91,4 +151,4 @@ export const systems = {
   },
 }
 
-export type SystemKey = keyof typeof systems 
+export type SystemKey = keyof typeof systemConfig 
