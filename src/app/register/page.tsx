@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSystem } from "@/context/SystemContext"
-import { systems } from "@/config/systems"
+import { systemConfig } from "@/types/system"
+import type { RegisterField } from "@/types/system"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -29,7 +30,7 @@ export default function RegisterPage() {
     } else {
       // Initialize form data based on system fields
       const initialData: Record<string, string> = {}
-      systems[system as keyof typeof systems].register.fields.forEach(field => {
+      systemConfig[system as keyof typeof systemConfig].register.fields.forEach((field: RegisterField) => {
         initialData[field.id] = ""
       })
       setFormData(initialData)
@@ -58,9 +59,9 @@ export default function RegisterPage() {
   }
 
   // Get the configuration for the current system
-  const systemConfig = systems[system as keyof typeof systems]
+  const currentSystemConfig = systemConfig[system as keyof typeof systemConfig]
 
-  if (!systemConfig) {
+  if (!currentSystemConfig) {
     return null  // Or a loading state
   }
 
@@ -68,14 +69,14 @@ export default function RegisterPage() {
     <div className="flex justify-center items-center h-screen">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{systemConfig.register.title}</CardTitle>
+          <CardTitle>{currentSystemConfig.register.title}</CardTitle>
           <CardDescription>
-            {systemConfig.register.description}
+            {currentSystemConfig.register.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
-            {systemConfig.register.fields.map((field) => (
+            {currentSystemConfig.register.fields.map((field) => (
               <div key={field.id} className="flex flex-col space-y-1.5">
                 <Label htmlFor={field.id}>{field.label}</Label>
                 <Input
@@ -91,9 +92,9 @@ export default function RegisterPage() {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => router.push("/login")}>
-            {systemConfig.register.backButton}
+            {currentSystemConfig.register.backButton}
           </Button>
-          <Button onClick={handleRegister}>{systemConfig.register.submitButton}</Button>
+          <Button onClick={handleRegister}>{currentSystemConfig.register.submitButton}</Button>
         </CardFooter>
       </Card>
     </div>
