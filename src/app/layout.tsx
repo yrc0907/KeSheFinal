@@ -4,6 +4,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner"
+import { PageLayoutEditor } from "@/components/PageLayoutEditor";
+import { EditPageButton } from "@/components/EditPageButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +26,8 @@ export default function RootLayout({
           <Navbar />
           <main>{children}</main>
           <Toaster />
+          <PageLayoutEditor />
+          <EditPageButton />
         </Providers>
       </body>
     </html>

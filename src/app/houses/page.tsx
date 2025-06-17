@@ -13,6 +13,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useSystem } from "@/context/SystemContext"
+import { PageEditorWrapper } from "@/components/PageEditorWrapper"
 
 interface House {
   id: string
@@ -87,69 +88,71 @@ export default function HousesPage() {
   }, [searchParams])
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
-        <aside className="md:col-span-1 sticky top-20">
-          <HouseSearchSidebar />
-        </aside>
-        <main className="md:col-span-3">
-          {isLoading ? (
-            <div className="text-center py-10">
-              <p>{uiLabels.loading}</p>
-            </div>
-          ) : houses.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {houses.map((house) => (
-                <Link href={`/houses/${house.id}`} key={house.id}>
-                  <Card className="flex flex-col justify-between h-full hover:shadow-lg transition-shadow duration-300">
-                    <div>
-                      <CardHeader>
-                        <CardTitle>{house.title}</CardTitle>
-                        <CardDescription>{house.type}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-1">
-                          <p className="text-xs font-semibold uppercase text-muted-foreground">
-                            {uiLabels.desc}
-                          </p>
-                          <p className="text-sm line-clamp-3">
-                            {house.description}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs font-semibold uppercase text-muted-foreground">
-                            {uiLabels.rent}
-                          </p>
-                          <p className="font-semibold text-lg">
-                            ${house.rent}{uiLabels.rentUnit}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </div>
-                    <CardFooter>
-                      <div className="w-full space-y-1">
-                        <p className="text-xs font-semibold uppercase text-muted-foreground">
-                          {uiLabels.address}
-                        </p>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {house.address}
-                        </p>
+    <PageEditorWrapper>
+      <div className="container mx-auto py-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
+          <aside className="md:col-span-1 sticky top-20">
+            <HouseSearchSidebar />
+          </aside>
+          <main className="md:col-span-3">
+            {isLoading ? (
+              <div className="text-center py-10">
+                <p>{uiLabels.loading}</p>
+              </div>
+            ) : houses.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {houses.map((house) => (
+                  <Link href={`/houses/${house.id}`} key={house.id}>
+                    <Card className="flex flex-col justify-between h-full hover:shadow-lg transition-shadow duration-300">
+                      <div>
+                        <CardHeader>
+                          <CardTitle>{house.title}</CardTitle>
+                          <CardDescription>{house.type}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="space-y-1">
+                            <p className="text-xs font-semibold uppercase text-muted-foreground">
+                              {uiLabels.desc}
+                            </p>
+                            <p className="text-sm line-clamp-3">
+                              {house.description}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs font-semibold uppercase text-muted-foreground">
+                              {uiLabels.rent}
+                            </p>
+                            <p className="font-semibold text-lg">
+                              ${house.rent}{uiLabels.rentUnit}
+                            </p>
+                          </div>
+                        </CardContent>
                       </div>
-                    </CardFooter>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20 bg-muted rounded-lg">
-              <h2 className="text-2xl font-semibold">{uiLabels.emptyTitle}</h2>
-              <p className="text-muted-foreground mt-2">
-                {uiLabels.emptyDesc}
-              </p>
-            </div>
-          )}
-        </main>
+                      <CardFooter>
+                        <div className="w-full space-y-1">
+                          <p className="text-xs font-semibold uppercase text-muted-foreground">
+                            {uiLabels.address}
+                          </p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {house.address}
+                          </p>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-muted rounded-lg">
+                <h2 className="text-2xl font-semibold">{uiLabels.emptyTitle}</h2>
+                <p className="text-muted-foreground mt-2">
+                  {uiLabels.emptyDesc}
+                </p>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
-    </div>
+    </PageEditorWrapper>
   )
 }

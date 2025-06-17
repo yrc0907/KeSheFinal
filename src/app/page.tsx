@@ -30,31 +30,38 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center text-center container mx-auto py-20">
-      <header className="mb-12">
-        <h1 className="text-5xl font-extrabold tracking-tight lg:text-6xl">
-          {content.title}
-        </h1>
-        <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
-          {content.description}
-        </p>
-      </header>
-      <div className="space-x-4">
-        <Button size="lg" onClick={() => router.push(content.primaryButton.link)}>
-          {content.primaryButton.text}
-        </Button>
-        <Button size="lg" variant="outline" onClick={() => router.push(content.secondaryButton.link)}>
-          {content.secondaryButton.text}
+    <div className="container mx-auto py-10">
+      <div className="flex flex-col items-center justify-center text-center mb-12">
+        <header className="mb-8">
+          <h1 className="text-5xl font-extrabold tracking-tight lg:text-6xl">
+            {content.title}
+          </h1>
+          <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+            {content.description}
+          </p>
+        </header>
+        <div className="space-x-4">
+          <Button size="lg" onClick={() => router.push(content.primaryButton.link)}>
+            {content.primaryButton.text}
+          </Button>
+          <Button size="lg" variant="outline" onClick={() => router.push(content.secondaryButton.link)}>
+            {content.secondaryButton.text}
+          </Button>
+        </div>
+
+        <Button
+          className="mt-6"
+          variant="link"
+          onClick={handleSwitchSystem}
+        >
+          切换系统
         </Button>
       </div>
 
-      <Button
-        className="mt-10"
-        variant="link"
-        onClick={handleSwitchSystem}
-      >
-        切换系统
-      </Button>
+      {/* 自定义面板布局区域 */}
+      <div className="mb-20">
+
+      </div>
     </div>
   )
 }
