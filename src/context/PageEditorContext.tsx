@@ -35,8 +35,9 @@ interface PageEditorContextType {
   pageLayouts: Record<string, PageLayout>;
   saveLayout: (pageId: string, elements: PageElement[]) => void;
   resetLayout: (pageId: string) => void;
-  updateElementPosition: (pageId: string, elementId: string, x: number, y: number, width?: number, height?: number) => void;
-  detectPageElements: () => void;
+  updateElementPosition: (pageId: string, elementId: string, dx: number, dy: number, width?: number, height?: number) => void;
+  detectPageElements: (iframeDoc: Document) => void;
+  applyLayout: (pageId: string, iframeDoc: Document, isDragEnd?: boolean) => void;
 }
 
 // 创建上下文
@@ -50,6 +51,7 @@ const PageEditorContext = createContext<PageEditorContextType>({
   resetLayout: () => { },
   updateElementPosition: () => { },
   detectPageElements: () => { },
+  applyLayout: () => { },
 });
 
 // 创建 Provider 组件
@@ -76,7 +78,9 @@ export function PageEditorProvider({ children }: { children: React.ReactNode }) 
 
     // 如果退出编辑模式，应用当前布局
     if (isEditMode && currentPageId && pageLayouts[currentPageId]) {
-      applyLayout(currentPageId);
+      // When exiting edit mode, we would ideally re-apply to the main document.
+      // However, the context of where to apply (iframe vs main) is complex.
+      // For now, the main save/apply logic is inside the editor itself.
     }
   };
 
@@ -113,57 +117,82 @@ export function PageEditorProvider({ children }: { children: React.ReactNode }) 
 
       saveLayout(pageId, elements);
 
-      // 应用重置的布局
-      applyLayout(pageId);
+      // We might need to re-apply layout to an iframe if it's active
+      // This part is tricky as the context doesn't know about the iframe.
+      // The calling component should handle applying the layout.
     }
   };
 
-  // 更新元素位置
+  // 更新元素位置 (handles deltas)
   const updateElementPosition = (
     pageId: string,
     elementId: string,
-    x: number,
-    y: number,
+    dx: number,
+    dy: number,
     width?: number,
-    height?: number
+    height?: number,
   ) => {
     if (!pageLayouts[pageId]) return;
 
     const updatedElements = pageLayouts[pageId].elements.map(element => {
       if (element.id === elementId) {
-        return {
+        const updatedElement = {
           ...element,
-          x,
-          y,
-          width: width || element.width,
-          height: height || element.height,
+          x: element.x + dx,
+          y: element.y + dy,
         };
+
+        // Update width and height if provided
+        if (width !== undefined) {
+          updatedElement.width = width;
+        }
+
+        if (height !== undefined) {
+          updatedElement.height = height;
+        }
+
+        return updatedElement;
       }
       return element;
     });
 
-    saveLayout(pageId, updatedElements);
+    setPageLayouts(prev => ({
+      ...prev,
+      [pageId]: { ...prev[pageId], elements: updatedElements },
+    }))
+    // Note: We don't save to localStorage on every move for performance.
+    // Saving will happen on a dedicated action, like a "Save" button.
   };
 
   // 应用布局到DOM
-  const applyLayout = (pageId: string) => {
+  const applyLayout = (pageId: string, iframeDoc: Document, isDragEnd: boolean = false) => {
     if (!pageLayouts[pageId]) return;
 
     pageLayouts[pageId].elements.forEach(element => {
-      const domElement = document.querySelector(element.selector);
+      const domElement = iframeDoc.querySelector(element.selector);
       if (domElement && domElement instanceof HTMLElement) {
         domElement.style.position = "relative";
-        domElement.style.left = `${element.x}px`;
-        domElement.style.top = `${element.y}px`;
-        if (element.width) domElement.style.width = `${element.width}px`;
-        if (element.height) domElement.style.height = `${element.height}px`;
+        domElement.style.transform = `translate(${element.x}px, ${element.y}px)`;
+        if (isDragEnd) {
+          // Persist final position to localStorage after drag
+          try {
+            localStorage.setItem("pageLayouts", JSON.stringify(pageLayouts));
+          } catch (e) {
+            console.error("Failed to save page layout:", e);
+          }
+        }
       }
     });
   };
 
   // 检测页面元素
-  const detectPageElements = () => {
+  const detectPageElements = (iframeDoc: Document) => {
     if (!currentPageId) return;
+
+    // Do not re-detect if layout already exists
+    if (pageLayouts[currentPageId]) {
+      return;
+    }
 
     // 定义可拖拽元素的选择器
     const selectors = [
@@ -172,13 +201,18 @@ export function PageEditorProvider({ children }: { children: React.ReactNode }) 
       "section",
       ".grid > div",
       "aside",
-      "header"
+      "header",
+      ".container > div",
+      ".flex-col > div",
+      "article",
+      ".panel",
+      "footer"
     ];
 
     const elements: PageElement[] = [];
 
     selectors.forEach((selector, index) => {
-      document.querySelectorAll(selector).forEach((element, elementIndex) => {
+      iframeDoc.querySelectorAll(selector).forEach((element, elementIndex) => {
         if (element instanceof HTMLElement) {
           const rect = element.getBoundingClientRect();
           const id = `${selector.replace(/[^a-zA-Z0-9]/g, '')}-${elementIndex}`;
@@ -187,14 +221,14 @@ export function PageEditorProvider({ children }: { children: React.ReactNode }) 
             id,
             selector: `${selector}:nth-of-type(${elementIndex + 1})`,
             type: element.tagName.toLowerCase(),
-            label: element.innerText?.substring(0, 20) || `Element ${index}-${elementIndex}`,
-            x: 0,
-            y: 0,
+            label: element.innerText?.substring(0, 20).trim() || `Element ${index}-${elementIndex}`,
+            x: 0, // Initial relative position
+            y: 0, // Initial relative position
             width: rect.width,
             height: rect.height,
             originalPosition: {
-              x: 0,
-              y: 0,
+              x: rect.left,
+              y: rect.top,
               width: rect.width,
               height: rect.height,
             },
@@ -203,10 +237,8 @@ export function PageEditorProvider({ children }: { children: React.ReactNode }) 
       });
     });
 
-    // 如果是新页面，保存检测到的元素
-    if (!pageLayouts[currentPageId]) {
-      saveLayout(currentPageId, elements);
-    }
+    // 保存检测到的元素
+    saveLayout(currentPageId, elements);
   };
 
   return (
@@ -221,6 +253,7 @@ export function PageEditorProvider({ children }: { children: React.ReactNode }) 
         resetLayout,
         updateElementPosition,
         detectPageElements,
+        applyLayout,
       }}
     >
       {children}
