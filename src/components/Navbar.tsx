@@ -16,11 +16,17 @@ import { ThemeToggle } from "./ThemeToggle"
 import { ColorSchemeToggle } from "./ColorSchemeToggle"
 import { useRouter } from "next/navigation"
 import { useSystem } from "@/context/SystemContext"
+import { useState, useEffect } from "react"
 
 export default function Navbar() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const { system, systemName } = useSystem()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // System-specific navigation items
   const navItems = {
@@ -63,10 +69,10 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <Link href="/" className="font-bold text-lg">
-              {systemName || "管理系统"}
+              {isMounted ? systemName : "管理系统"}
             </Link>
             <div className="hidden md:flex items-baseline space-x-4">
-              {navItems.map((item, index) => (
+              {isMounted && navItems.map((item, index) => (
                 <Link
                   key={index}
                   href={item.href}
@@ -104,7 +110,7 @@ export default function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {dropdownItems.map((item, index) => (
+                  {isMounted && dropdownItems.map((item, index) => (
                     <DropdownMenuItem key={index} onClick={() => router.push(item.href)}>
                       {item.name}
                     </DropdownMenuItem>

@@ -3,13 +3,28 @@
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Pencil } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export function EditPageButton() {
   const router = useRouter()
   const pathname = usePathname()
+  const [isInIframe, setIsInIframe] = useState(false)
 
-  // Do not show the button on the editor page itself or on auth pages
-  if (pathname.startsWith("/editor") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/system-select")) {
+  useEffect(() => {
+    // Check if the window is inside an iframe
+    if (window.self !== window.top) {
+      setIsInIframe(true)
+    }
+  }, [])
+
+  // Do not show the button on the editor page itself, on auth pages, or inside an iframe
+  if (
+    isInIframe ||
+    pathname.startsWith("/editor") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/system-select")
+  ) {
     return null
   }
 

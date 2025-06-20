@@ -80,21 +80,27 @@ export function DraggableElement({ element, children }: DraggableElementProps) {
     const handleMouseUp = () => {
       if (isDragging && elementRef.current && currentPageId) {
         const rect = elementRef.current.getBoundingClientRect();
+        const dx = rect.left - (element.originalPosition.x + element.x);
+        const dy = rect.top - (element.originalPosition.y + element.y);
+
         updateElementPosition(
           currentPageId,
           element.id,
-          rect.left,
-          rect.top
+          dx,
+          dy
         );
       }
 
       if (isResizing && elementRef.current && currentPageId) {
         const rect = elementRef.current.getBoundingClientRect();
+        const dx = rect.left - (element.originalPosition.x + element.x);
+        const dy = rect.top - (element.originalPosition.y + element.y);
+
         updateElementPosition(
           currentPageId,
           element.id,
-          rect.left,
-          rect.top,
+          dx,
+          dy,
           rect.width,
           rect.height
         );
