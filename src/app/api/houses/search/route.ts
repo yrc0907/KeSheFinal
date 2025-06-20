@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
   if (query) {
     where.address = {
       contains: query,
-      mode: "insensitive",
     }
   }
 
